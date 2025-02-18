@@ -3,28 +3,24 @@ using CashFlow.Exception;
 using CommonTestUtilities.Requests;
 using FluentAssertions;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using WebApi.Test.InlineData;
 
 namespace WebApi.Test.Login.DoLogin
 {
-    public class DoLoginTest : IClassFixture<CustomWebApplicationFactory>
+    public class DoLoginTest : CashFlowClassFixture
     {
         private const string METHOD = "api/Login";
 
-        private readonly HttpClient _httpClient;
         private readonly string _email;
         private readonly string _name;
         private readonly string _password;
 
-        public DoLoginTest(CustomWebApplicationFactory customWebApplicationFactory)
+        public DoLoginTest(CustomWebApplicationFactory customWebApplicationFactory) : base(customWebApplicationFactory)
         {
-            _httpClient = customWebApplicationFactory.CreateClient();
-            _name = customWebApplicationFactory.GetName();
-            _email = customWebApplicationFactory.GetEmail();
-            _password = customWebApplicationFactory.GetPassword();
+            _name = customWebApplicationFactory.User_Team_Member.GetName();
+            _email = customWebApplicationFactory.User_Team_Member.GetEmail();
+            _password = customWebApplicationFactory.User_Team_Member.GetPassword();
         }
 
         [Fact]
@@ -36,7 +32,7 @@ namespace WebApi.Test.Login.DoLogin
                 Password = _password
             };
 
-            var response = await _httpClient.PostAsJsonAsync(METHOD, request);
+            var response = await DoPost(METHOD, request);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -53,8 +49,7 @@ namespace WebApi.Test.Login.DoLogin
         {
             var request = RequestLoginJsonBuilder.Build();
 
-            _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(culture));
-            var response = await _httpClient.PostAsJsonAsync(METHOD, request);
+            var response = await DoPost(METHOD, request, culture: culture);
 
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 

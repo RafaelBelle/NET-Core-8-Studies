@@ -10,7 +10,7 @@ using MigraDoc.Rendering;
 using PdfSharp.Fonts;
 
 namespace CashFlow.Application.UseCases.Expenses.Reports.Pdf;
-internal class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdfUseCase
+public class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdfUseCase
 {
     private const string CURRENCY_SYMBOL = "$";
     private const int ROW_HEIGHT_EXPENSE_TABLE = 25;

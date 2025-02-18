@@ -17,14 +17,20 @@ public class PasswordValidator<T> : PropertyValidator<T, string>
     public override bool IsValid(ValidationContext<T> context, string password)
     {
         bool passwordIsNull = string.IsNullOrWhiteSpace(password);
+
+        if (passwordIsNull)
+        {
+            context.MessageFormatter.AppendArgument(ERROR_MESSAGE_KEY, ResourceErrorMessages.INVALID_PASSWORD);
+            return false;
+        }
+
         bool passwordIsLesserThanMinimumCharacters = password.Length < 8;
         bool passwordContainCapitalLetter = Regex.IsMatch(password, @"[A-Z]+");
         bool passwordContainLowercaseLetter = Regex.IsMatch(password, @"[a-z]+");
         bool passwordContainDigit = Regex.IsMatch(password, @"[0-9]+");
         bool passwordContainSpecialSymbol = Regex.IsMatch(password, @"[\!\@\#\$\%\.\*]+");
 
-        if (passwordIsNull
-            || passwordIsLesserThanMinimumCharacters
+        if (passwordIsLesserThanMinimumCharacters
             || passwordContainCapitalLetter == false
             || passwordContainLowercaseLetter == false
             || passwordContainDigit == false
