@@ -1,6 +1,11 @@
-﻿using CashFlow.Application.UseCases.Users.Register;
+﻿using CashFlow.Application.UseCases.Users.ChangePassword;
+using CashFlow.Application.UseCases.Users.Delete;
+using CashFlow.Application.UseCases.Users.Profile;
+using CashFlow.Application.UseCases.Users.Register;
+using CashFlow.Application.UseCases.Users.Update;
 using CashFlow.Communication.Requests;
 using CashFlow.Communication.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashFlow.Api.Controllers;
@@ -16,5 +21,47 @@ public class UserController : ControllerBase
         var response = await useCase.Execute(request);
 
         return Created(string.Empty, response);
+    }
+
+    [HttpGet]
+    [ProducesResponseType(typeof(ResponseUserProfileJson), StatusCodes.Status200OK)]
+    [Authorize]
+    public async Task<IActionResult> GetProfile([FromServices] IGetUserProfileUseCase useCase)
+    {
+        var response = await useCase.Execute();
+
+        return Ok(response);
+    }
+
+    [HttpPut]
+    [ProducesResponseType(typeof(ResponseUserProfileJson), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfile([FromServices] IUpdateUserProfileUseCase useCase, [FromBody] RequestUpdateUserJson request)
+    {
+        await useCase.Execute(request);
+
+        return NoContent();
+    }
+
+    [HttpPut("change-password")]
+    [ProducesResponseType(typeof(ResponseUserProfileJson), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromServices] IChangePasswordUseCase useCase, [FromBody] RequestChangePasswordJson request)
+    {
+        await useCase.Execute(request);
+
+        return NoContent();
+    }
+
+    [HttpDelete]
+    [ProducesResponseType(typeof(ResponseUserProfileJson), StatusCodes.Status204NoContent)]
+    [Authorize]
+    public async Task<IActionResult> DeleteProfile([FromServices] IDeleteUserProfileUseCase useCase)
+    {
+        await useCase.Execute();
+
+        return NoContent();
     }
 }
