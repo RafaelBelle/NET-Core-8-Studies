@@ -75,10 +75,17 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         return user;
     }
 
-    private Expense AddExpenses(CashFlowDbContext dbContext, User user, long expenseId)
+    private Expense AddExpenses(CashFlowDbContext dbContext, User user, long expenseId, long tagId)
     {
         var expense = ExpenseBuilder.Build(user);
         expense.Id = expenseId;
+
+        foreach (var tag in expense.Tags)
+        {
+            tag.Id = tagId;
+            tag.ExpenseId = expenseId;
+        }
+
         dbContext.Expenses.Add(expense);
 
         return expense;
@@ -87,11 +94,11 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     private void StartDataBase(CashFlowDbContext dbContext, IPasswordEncrypter passwordEncrypter, IAccessTokenGenerator tokenGenerator)
     {
         var userTeamMember = AddUserTeamMember(dbContext, passwordEncrypter, tokenGenerator);
-        var expenseTeamMember = AddExpenses(dbContext, userTeamMember, 1);
+        var expenseTeamMember = AddExpenses(dbContext, userTeamMember, 1, 1);
         Expense_TeamMember = new ExpenseIdentityManager(expenseTeamMember);
 
         var userAdmin = AddUserAdmin(dbContext, passwordEncrypter, tokenGenerator);
-        var expenseAdmin = AddExpenses(dbContext, userAdmin, 2);
+        var expenseAdmin = AddExpenses(dbContext, userAdmin, 2, 2);
         Expense_Admin = new ExpenseIdentityManager(expenseAdmin);
 
         dbContext.SaveChanges();
